@@ -2,7 +2,8 @@
   "name": "express-simple-starter",
   "private": true,
   "scripts": {
-    "start": "node index.js"
+    "dev": "node index.js",
+    "start": "node server"
   },
   "dependencies": {
     "cors": "^2.8.5",
