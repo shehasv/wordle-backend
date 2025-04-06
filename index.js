@@ -11,7 +11,7 @@ const http = require('http').Server(app);
 
 const socketIO = require('socket.io')(http, {
   cors: {
-    origin: ["http://localhost:5173", "https://wordle-shehas.netlify.app"]
+    origin: ["http://localhost:5173", "http://ec2-51-21-195-196.eu-north-1.compute.amazonaws.com:3001"]
   },
 });
 
