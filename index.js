@@ -20,9 +20,12 @@ let roomsArr = []
 socketIO.on('connection', (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
   socket.on('disconnect', () => {
-    roomsArr = roomsArr.filter((room) => {
-      return room.userId != socket.id
-    })
+    roomsArr.forEach((room) => {
+      if (room.members.some(member => member.id === socket.id)) {
+        socket.to(room.roomName).emit('playerDisconnected', { message: 'Opponent disconnected' });
+      }
+    });
+    roomsArr = roomsArr.filter((room) => !room.members.some(member => member.id === socket.id));
     console.log('🔥: user disconnected');
   });
   socket.on('createRoom',(data) => {
@@ -31,7 +34,7 @@ socketIO.on('connection', (socket) => {
       roomName: data.roomName,
       solution: data.solution,
       userId: socket.id,
-      members: [socket.id]
+      members: [{ id: socket.id, name: data.name }]
     })
     console.log(`${data.name} Created the room: ${data.roomName}`);
   })
@@ -45,19 +48,21 @@ socketIO.on('connection', (socket) => {
         })
       }else{
         socket.join(data.roomName)
-        roomsArr[roomIndex].members.push(socket.id)
+        roomsArr[roomIndex].members.push({ id: socket.id, name: data.name })
         console.log(`${data.name} Joined the room: ${data.roomName}`);
-        const solution = roomsArr[roomsArr.findIndex((room) => room.roomName == data.roomName)]?.solution
-        console.log(roomsArr[roomIndex].members)
+        const currentRoom = roomsArr[roomIndex];
+        console.log(currentRoom.members)
         socket.to(data.roomName).emit('validRoom',{
           message: 'Room is valid',
           roomName: data.roomName,
-          solution: solution
+          solution: currentRoom.solution,
+          players: currentRoom.members
         })
         socket.emit('validRoom',{
           message: 'Room is valid',
           roomName: data.roomName,
-          solution: solution
+          solution: currentRoom.solution,
+          players: currentRoom.members
         })
         
       }
