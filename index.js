@@ -80,6 +80,9 @@ socketIO.on('connection', (socket) => {
   });
 
   socket.on('playerFailed', (data) => {
+    socket.to(data.roomName).emit('opponentFailed', {
+      message: 'Opponent has failed'
+    });
     const roomIndex = roomsArr.findIndex((room) => room.roomName == data.roomName)
     if(roomIndex > -1){
       roomsArr[roomIndex].failedCount = (roomsArr[roomIndex].failedCount || 0) + 1;
