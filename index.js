@@ -65,6 +65,7 @@ socketIO.on('connection', (socket) => {
       socket.emit('invalidRoom',{
         message: 'Room is invalid'
       })
+    }
   })
 
   socket.on('playerWon', (data) => {
