@@ -65,8 +65,24 @@ socketIO.on('connection', (socket) => {
       socket.emit('invalidRoom',{
         message: 'Room is invalid'
       })
-    }
   })
+
+  socket.on('playerWon', (data) => {
+    socket.to(data.roomName).emit('opponentWon', {
+      message: 'Opponent has won the game'
+    });
+  });
+
+  socket.on('playerFailed', (data) => {
+    const roomIndex = roomsArr.findIndex((room) => room.roomName == data.roomName)
+    if(roomIndex > -1){
+      roomsArr[roomIndex].failedCount = (roomsArr[roomIndex].failedCount || 0) + 1;
+      if (roomsArr[roomIndex].failedCount === 2) {
+        socket.to(data.roomName).emit('matchTied');
+        socket.emit('matchTied');
+      }
+    }
+  });
 
 });
 
